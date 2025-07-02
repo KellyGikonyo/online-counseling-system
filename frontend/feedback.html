@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Give Feedback</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f6fa; margin: 0; }
+        .feedback-container {
+            max-width: 430px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 16px rgba(60,90,180,0.08);
+            padding: 32px 28px 24px 28px;
+        }
+        h2 { color: #6366f1; margin-bottom: 18px; }
+        .star-row { margin-bottom: 18px; }
+        .star-label { display: block; margin-bottom: 6px; color: #374151; font-weight: 600; }
+        .stars {
+            display: inline-flex;
+            gap: 4px;
+            font-size: 1.7rem;
+            cursor: pointer;
+        }
+        .star {
+            color: #e5e7eb;
+            transition: color 0.2s;
+        }
+        .star.selected, .star:hover, .star.selected ~ .star {
+            color: #fbbf24;
+        }
+        .emoji-bar {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin: 18px 0 22px 0;
+        }
+        .emoji {
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .emoji.selected {
+            transform: scale(1.25);
+            filter: drop-shadow(0 2px 6px #6366f1aa);
+        }
+        textarea {
+            width: 100%;
+            min-height: 60px;
+            border-radius: 8px;
+            border: 1px solid #a5b4fc;
+            padding: 10px;
+            margin-bottom: 18px;
+            font-size: 1rem;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            margin-bottom: 18px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: #6366f1;
+            width: 0;
+            transition: width 0.3s;
+        }
+        button {
+            padding: 10px 24px;
+            background: #6366f1;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        button:disabled {
+            background: #a5b4fc;
+            cursor: not-allowed;
+        }
+        .confirmation {
+            margin-top: 18px;
+            color: #22c55e;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="feedback-container">
+        <h2>We Value Your Feedback!</h2>
+        <form id="feedbackForm">
+            <div class="progress-bar-bg">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+            <div class="star-row">
+                <span class="star-label">Counselor Communication</span>
+                <span class="stars" data-category="communication"></span>
+            </div>
+            <div class="star-row">
+                <span class="star-label">Session Helpfulness</span>
+                <span class="stars" data-category="helpfulness"></span>
+            </div>
+            <div class="star-row">
+                <span class="star-label">Website Usability</span>
+                <span class="stars" data-category="usability"></span>
+            </div>
+            <div class="star-row">
+                <span class="star-label">Overall Experience</span>
+                <span class="stars" data-category="overall"></span>
+            </div>
+            <div>
+                <span class="star-label">How did you feel?</span>
+                <div class="emoji-bar" id="emojiBar">
+                    <span class="emoji" data-value="😡" title="Angry">😡</span>
+                    <span class="emoji" data-value="😕" title="Unhappy">😕</span>
+                    <span class="emoji" data-value="😐" title="Neutral">😐</span>
+                    <span class="emoji" data-value="🙂" title="Happy">🙂</span>
+                    <span class="emoji" data-value="🤩" title="Awesome!">🤩</span>
+                </div>
+            </div>
+            <textarea id="comments" placeholder="Additional comments (optional)"></textarea>
+            <button type="submit" id="submitBtn" disabled>Submit Feedback</button>
+        </form>
+        <div class="confirmation" id="confirmationMsg" style="display:none;">
+            Thank you for your feedback! 🎉
+        </div>
+    </div>
+    <script>
+        // Star rating logic
+        const categories = ["communication", "helpfulness", "usability", "overall"];
+        const ratings = {};
+        categories.forEach(cat => ratings[cat] = 0);
+
+        function renderStars() {
+            categories.forEach(cat => {
+                const starsContainer = document.querySelector(`.stars[data-category="${cat}"]`);
+                starsContainer.innerHTML = "";
+                for (let i = 1; i <= 5; i++) {
+                    const star = document.createElement("span");
+                    star.className = "star" + (i <= ratings[cat] ? " selected" : "");
+                    star.innerHTML = "★";
+                    star.dataset.value = i;
+                    star.onclick = () => {
+                        ratings[cat] = i;
+                        renderStars();
+                        updateProgress();
+                    };
+                    starsContainer.appendChild(star);
+                }
+            });
+        }
+        renderStars();
+
+        // Emoji bar logic
+        let selectedEmoji = "";
+        document.querySelectorAll('.emoji').forEach(emoji => {
+            emoji.onclick = function() {
+                document.querySelectorAll('.emoji').forEach(e => e.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedEmoji = this.dataset.value;
+                updateProgress();
+            };
+        });
+
+        // Progress indicator logic
+        function updateProgress() {
+            let filled = 0;
+            categories.forEach(cat => { if (ratings[cat] > 0) filled++; });
+            if (selectedEmoji) filled++;
+            const percent = Math.round((filled / (categories.length + 1)) * 100);
+            document.getElementById('progressBar').style.width = percent + "%";
+            document.getElementById('submitBtn').disabled = (percent < 100);
+        }
+
+        // Feedback form submission
+        document.getElementById('feedbackForm').onsubmit = function(e) {
+            e.preventDefault();
+            document.getElementById('submitBtn').disabled = true;
+            fetch('http://localhost:3000/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    communication: ratings.communication,
+                    helpfulness: ratings.helpfulness,
+                    usability: ratings.usability,
+                    overall: ratings.overall,
+                    emoji: selectedEmoji,
+                    comments: document.getElementById('comments').value.trim(),
+                    user: localStorage.getItem('username') || null
+                })
+            }).then(res => res.json()).then(data => {
+                document.getElementById('feedbackForm').style.display = "none";
+                document.getElementById('confirmationMsg').style.display = "block";
+            });
+        };
+    </script>
+</body>
+</html>

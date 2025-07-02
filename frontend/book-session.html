@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Session - Online Guidance & Counseling System</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; text-align: center; padding: 0; margin: 0; min-height: 100vh; background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%); display: flex; flex-direction: column;}
+        header { padding: 40px 0 10px 0; background: rgba(255,255,255,0.25); box-shadow: 0 2px 16px rgba(0,0,0,0.05); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);}
+        h1 { margin-bottom: 10px; color: #2d3a4b; letter-spacing: 1px; font-size: 2.3rem; font-weight: 700;}
+        .session-form {
+    margin: 40px auto 0 auto;
+    background: rgba(255,255,255,0.7);
+    padding: 32px 24px;
+    border-radius: 18px;
+    box-shadow: 0 4px 32px rgba(60, 90, 180, 0.10);
+    max-width: 400px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+        .session-form input, .session-form select, .session-form textarea { width: 90%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #a5b4fc; font-size: 1rem;}
+        .session-form button { padding: 10px 24px; border-radius: 8px; border: none; background: #6366f1; color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px;}
+        #sessionMsg { display: none; color: #388e3c; margin-top: 10px; font-size: 1rem;}
+        footer { margin-top: auto; padding: 8px 0 6px 0; color: #888; background: rgba(255,255,255,0.25); font-size: 0.9rem; letter-spacing: 1px; box-shadow: 0 -2px 16px rgba(0,0,0,0.03); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);}
+        .session-label {
+            display: block;
+            text-align: left;
+            margin-left: 5%;
+        }
+        @media (max-width: 700px) { .session-form { width: 95vw; max-width: 98vw;} header { padding: 24px 0 6px 0;}}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Book a Session</h1>
+        <p>Schedule a counseling session below.</p>
+    </header>
+    <div class="session-form">
+        <form id="sessionForm">
+            <input type="text" id="studentName" placeholder="Your Name" required><br>
+            <input type="email" id="studentEmail" placeholder="Your Email" required><br>
+            <label for="counselor" class="session-label">Counselor</label>
+            <select id="counselor" required>
+                <option value="">Select Counselor</option>
+                <option value="counselor1">Counselor 1</option>
+                <option value="counselor2">Counselor 2</option>
+            </select><br>
+            <label for="sessionDate" class="session-label">Session Date</label>
+            <input type="date" id="sessionDate" title="Select session date" placeholder="Select session date" required><br>
+            <textarea id="sessionReason" rows="3" placeholder="Reason for Session" required></textarea><br>
+            <button type="submit">Book Session</button>
+            <p id="sessionMsg">Your session has been booked!</p>
+        </form>
+    </div>
+    <div class="booking-form">
+        <h2>Book a Session</h2>
+        <form id="bookSessionForm">
+            <input type="text" id="counselor" placeholder="Counselor Username" required><br>
+            <label for="date" class="session-label">Session Date</label>
+            <input type="date" id="date" title="Select session date" placeholder="Select session date" required><br>
+            <label for="time" class="session-label">Session Time</label>
+            <input type="time" id="time" title="Select session time" placeholder="Select session time" required><br>
+            <input type="text" id="reason" placeholder="Reason (optional)"><br>
+            <button type="submit">Book Session</button>
+        </form>
+        <div id="bookingResult"></div>
+    </div>
+    <footer>
+        <p>&copy; 2025 Josh - Online Guidance and Counseling System</p>
+    </footer>
+<script>
+const sessions = []; // In-memory, use DB for production
+document.getElementById('sessionForm').onsubmit = function(e) {
+    e.preventDefault();
+    document.getElementById('sessionMsg').style.display = 'block';
+    document.getElementById('sessionForm').reset();
+    setTimeout(() => {
+        document.getElementById('sessionMsg').style.display = 'none';
+    }, 4000);
+}
+
+// Book a session
+app.post('/book-session', (req, res) => {
+    const { student, counselor, date, time, reason } = req.body;
+    if (!student || !counselor || !date || !time) {
+        return res.status(400).json({ success: false, message: 'Missing fields' });
+    }
+    const session = { id: sessions.length + 1, student, counselor, date, time, reason };
+    sessions.push(session);
+    res.json({ success: true, session });
+});
+
+// Get all sessions
+app.get('/sessions', (req, res) => {
+    res.json(sessions);
+});
+
+document.getElementById('bookSessionForm').onsubmit = function(e) {
+    e.preventDefault();
+    const student = localStorage.getItem('username') || 'student';
+    const counselor = document.getElementById('counselor').value.trim();
+    const date = document.getElementById('date').value;
+    const time = document.getElementById('time').value;
+    const reason = document.getElementById('reason').value.trim();
+    fetch('http://localhost:3000/book-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student, counselor, date, time, reason })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('bookingResult').innerText = "Session booked successfully!";
+        } else {
+            document.getElementById('bookingResult').innerText = "Booking failed: " + data.message;
+        }
+    });
+};
+</script>
+</body>
+</html>

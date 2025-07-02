@@ -1,0 +1,179 @@
+<!-- counselor-dashboard.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Counselor Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f6fa; margin: 0; }
+        .dashboard { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 14px; box-shadow: 0 2px 16px rgba(60,90,180,0.08); padding: 32px 24px; }
+        .dashboard-nav { margin-bottom: 24px; }
+        .nav-btn { display: inline-block; margin-right: 10px; padding: 10px 20px; background: #e0e7ff; color: #374151; border-radius: 8px; text-decoration: none; font-weight: 600; }
+        .nav-btn:hover, .nav-btn.active { background: #6366f1; color: #fff; }
+        h2 { color: #6366f1; }
+        .section { margin-bottom: 40px; display: none; }
+        .section.active { display: block; }
+        .logout-btn { background: #d32f2f; color: #fff; }
+        .logout-btn:hover { background: #b91c1c; }
+        ul { padding-left: 18px; }
+        .inbox-message { background: #f1f5f9; border-radius: 8px; margin-bottom: 12px; padding: 12px 14px; }
+        .inbox-message .meta { font-size: 0.95em; color: #6366f1; margin-bottom: 6px; }
+        .inbox-message .msg-text { color: #22223b; }
+        .reply-form { margin-top: 28px; }
+        .reply-form input, .reply-form textarea { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #a5b4fc; margin-bottom: 8px; }
+        .reply-form button { margin-top: 10px; padding: 10px 28px; background: #6366f1; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .reply-form button:hover { background: #4338ca; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="dashboard-nav">
+            <a href="#" class="nav-btn active" onclick="showSection('inbox')">Inbox</a>
+            <a href="#" class="nav-btn" onclick="showSection('students')">Assigned Students</a>
+            <a href="#" class="nav-btn" onclick="showSection('sessions')">Sessions</a>
+            <a href="index.html" class="nav-btn logout-btn" onclick="logout()">Logout</a>
+        </div>
+        <h2>Counselor Dashboard</h2>
+
+        <!-- Inbox Section -->
+        <div class="section active" id="inboxSection">
+            <h3>Your Inbox</h3>
+            <div id="messages"></div>
+            <div class="reply-form">
+                <h4 style="margin-bottom:10px;color:#6366f1;">Send Message to Student</h4>
+                <input type="text" id="student" placeholder="Student Username" required>
+                <label for="replyText" style="font-weight:600;">Your Message</label>
+                <textarea id="replyText" rows="3" placeholder="Type your reply..."></textarea>
+                <button onclick="sendReply()">Send Reply</button>
+            </div>
+        </div>
+
+        <!-- Students Section -->
+        <div class="section" id="studentsSection">
+            <h3>Assigned Students</h3>
+            <ul class="students-list" id="studentsList">
+                <!-- Will be populated dynamically -->
+            </ul>
+        </div>
+
+        <!-- Sessions Section -->
+        <div class="section" id="sessionsSection">
+            <h3>Your Sessions</h3>
+            <ul id="counselorSessionsList"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Only let counselors in!
+        if (localStorage.getItem('userRole') !== 'counselor') {
+            window.location.href = "index.html";
+        }
+
+        // Navigation logic
+        function showSection(section) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            if(section === 'inbox') {
+                document.querySelector('.nav-btn:nth-child(1)').classList.add('active');
+                document.getElementById('inboxSection').classList.add('active');
+                loadInbox();
+            } else if(section === 'students') {
+                document.querySelector('.nav-btn:nth-child(2)').classList.add('active');
+                document.getElementById('studentsSection').classList.add('active');
+                loadStudents();
+            } else if(section === 'sessions') {
+                document.querySelector('.nav-btn:nth-child(3)').classList.add('active');
+                document.getElementById('sessionsSection').classList.add('active');
+                loadCounselorSessions();
+            }
+        }
+
+        // Inbox logic
+        const counselor = localStorage.getItem('username') || 'counselor';
+
+        function loadInbox() {
+            fetch(`http://localhost:3000/inbox/${counselor}`)
+                .then(res => res.json())
+                .then(data => {
+                    const messagesDiv = document.getElementById('messages');
+                    if (!data.length) {
+                        messagesDiv.innerHTML = "<p style='color:#888;text-align:center;'>No messages yet.</p>";
+                        return;
+                    }
+                    messagesDiv.innerHTML = data.map(m =>
+                        `<div class="inbox-message">
+                            <div class="meta">
+                                <span>From: <span style="color:#374151;">${m.fromUser}</span></span>
+                                <span style="margin-left:18px;">To: <span style="color:#374151;">${m.toUser}</span></span>
+                                <span class="timestamp">${m.time ? new Date(m.time).toLocaleString() : ''}</span>
+                            </div>
+                            <div class="msg-text">${m.text}</div>
+                        </div>`
+                    ).join('');
+                });
+        }
+
+        function sendReply() {
+            const to = document.getElementById('student').value.trim();
+            const text = document.getElementById('replyText').value.trim();
+            if (!to || !text) return alert("Enter student username and message.");
+
+            fetch('http://localhost:3000/send-message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    fromUser: localStorage.getItem('username'),
+                    toUser: to,
+                    text: text
+                })
+            }).then(() => {
+                document.getElementById('replyText').value = '';
+                loadInbox();
+            });
+        }
+
+        // Students logic
+        function loadStudents() {
+            fetch(`http://localhost:3000/assigned-students/${counselor}`)
+                .then(res => res.json())
+                .then(students => {
+                    const list = document.getElementById('studentsList');
+                    if (!students.length) {
+                        list.innerHTML = "<li>No students assigned yet.</li>";
+                        return;
+                    }
+                    list.innerHTML = students.map(s =>
+                        `<li>${s.name || s.username} (${s.username})</li>`
+                    ).join('');
+                });
+        }
+
+        // Sessions logic
+        function loadCounselorSessions() {
+            fetch(`http://localhost:3000/sessions?counselor=${encodeURIComponent(counselor)}`)
+                .then(res => res.json())
+                .then(data => {
+                    const sessionsList = document.getElementById('counselorSessionsList');
+                    if (!data.length) {
+                        sessionsList.innerHTML = "<li>No sessions found.</li>";
+                        return;
+                    }
+                    sessionsList.innerHTML = data.map(s =>
+                        `<li>${s.date} - ${s.time}: ${s.topic || s.reason || ''} with ${s.student}</li>`
+                    ).join('');
+                });
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+
+        // Load inbox by default
+        window.onload = function() {
+            showSection('inbox');
+        };
+    </script>
+</body>
+</html>

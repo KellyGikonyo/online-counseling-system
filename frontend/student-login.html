@@ -1,0 +1,116 @@
+<!-- student-login.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login - Online Guidance & Counseling System</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Copy the same <style> block from index.html here */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            text-align: center;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            padding: 40px 0 10px 0;
+            background: rgba(255,255,255,0.25);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+        }
+        h1 {
+            margin-bottom: 10px;
+            color: #2d3a4b;
+            letter-spacing: 1px;
+            font-size: 2.3rem;
+            font-weight: 700;
+        }
+        .login-form {
+            margin: 40px auto 0 auto;
+            background: rgba(255,255,255,0.7);
+            padding: 32px 24px;
+            border-radius: 18px;
+            box-shadow: 0 4px 32px rgba(60, 90, 180, 0.10);
+            max-width: 340px;
+        }
+        .login-form input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #a5b4fc;
+            font-size: 1rem;
+        }
+        .login-form button {
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            background: #6366f1;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        footer {
+            margin-top: auto;
+            padding: 18px 0 10px 0;
+            color: #888;
+            background: rgba(255,255,255,0.25);
+            font-size: 1rem;
+            letter-spacing: 1px;
+            box-shadow: 0 -2px 16px rgba(0,0,0,0.03);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+        }
+        @media (max-width: 700px) {
+            .login-form {
+                width: 95vw;
+                max-width: 98vw;
+            }
+            header {
+                padding: 24px 0 6px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Student Login</h1>
+        <p>Enter your credentials to access your portal.</p>
+    </header>
+    <div class="login-form">
+        <form id="studentLoginForm">
+            <input type="text" name="username" id="username" placeholder="Username" autocomplete="username" required><br>
+            <input type="password" name="password" id="password" placeholder="Password" autocomplete="current-password" required><br>
+            <button type="submit">Login</button>
+            <p id="loginError">Invalid credentials!</p>
+        </form>
+    </div>
+    <footer>
+        <p>&copy; 2025 Josh - Online Guidance and Counseling System</p>
+    </footer>
+
+<script>
+document.getElementById('studentLoginForm').onsubmit = function(e) {
+    e.preventDefault();
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    // Example credentials: student/student123
+    if(user === 'student' && pass === 'student123') {
+        localStorage.setItem('userRole', 'student');
+        window.location.href = 'student-dashboard.html';
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+    }
+}
+</script>
+</body>
+</html>

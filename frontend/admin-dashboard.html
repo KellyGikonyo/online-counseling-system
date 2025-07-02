@@ -1,0 +1,308 @@
+<!-- admin-dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f6fa; margin: 0; }
+        .dashboard { max-width: 1000px; margin: 40px auto; background: #fff; border-radius: 14px; box-shadow: 0 2px 16px rgba(60,90,180,0.08); padding: 32px 24px; }
+        .dashboard-nav { margin-bottom: 24px; }
+        .nav-btn { display: inline-block; margin-right: 10px; padding: 10px 20px; background: #e0e7ff; color: #374151; border-radius: 8px; text-decoration: none; font-weight: 600; }
+        .nav-btn:hover, .nav-btn.active { background: #6366f1; color: #fff; }
+        h2 { color: #6366f1; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+        th, td { border: 1px solid #a5b4fc; padding: 8px; text-align: left; }
+        th { background: #e0e7ff; }
+        .section { margin-bottom: 40px; display: none; }
+        .section.active { display: block; }
+        .logout-btn { background: #d32f2f; color: #fff; }
+        .logout-btn:hover { background: #b91c1c; }
+        button.remove { background: #e11d48; color: white; border: none; border-radius:6px; padding: 6px 13px; cursor: pointer; }
+        button.remove:hover { background: #be123c;}
+        #feedbackModal { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.32); z-index:1000; align-items:center; justify-content:center; }
+        #feedbackModal > div { background:#fff; padding:32px 18px 18px 18px; border-radius:12px; max-width:600px; width:95vw; max-height:80vh; overflow:auto; position:relative; }
+        #feedbackModal button { position:absolute; top:10px; right:16px; background:none; border:none; font-size:1.5rem; cursor:pointer; }
+        #modalFeedbackTable { width:100%; border-collapse:collapse; }
+        #modalFeedbackTable th, #modalFeedbackTable td { border-bottom:1px solid #a5b4fc; padding:6px; }
+        .fullwidth-collapse { width: 100%; border-collapse: collapse; }
+        .feedback-th { border-bottom: 1px solid #a5b4fc; padding: 6px; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="dashboard-nav">
+            <a href="#" class="nav-btn active" onclick="showSection('counselors')">Counselors</a>
+            <a href="#" class="nav-btn" onclick="showSection('students')">Students</a>
+            <a href="#" class="nav-btn" onclick="showSection('sessions')">Sessions</a>
+            <a href="#" class="nav-btn" onclick="showSection('support')">Support Requests</a>
+            <a href="#" class="nav-btn" onclick="showSection('feedback')">Feedback</a>
+            <a href="index.html" class="nav-btn logout-btn" onclick="logout()">Logout</a>
+        </div>
+        <h2>Admin Dashboard</h2>
+
+        <div class="section active" id="counselorsSection">
+            <h3>All Counselors</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="counselorTable"></tbody>
+            </table>
+        </div>
+
+        <div class="section" id="studentsSection">
+            <h3>All Students</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTable"></tbody>
+            </table>
+        </div>
+
+        <div class="section" id="sessionsSection">
+            <h3>Recent Activity (Sessions)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Counselor</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody id="sessionTable"></tbody>
+            </table>
+        </div>
+
+          <table class="fullwidth-collapse">
+            <thead>
+              <tr>
+                <th class="feedback-th">From</th>
+                <th class="feedback-th">To</th>
+                <th class="feedback-th">Rating</th>
+                <th class="feedback-th">Comment</th>
+              </tr>
+            </thead>
+            <tbody id="feedbackTable"></tbody>
+          </table>
+            <tbody id="feedbackTable"></tbody>
+          </table>
+        </div>
+
+        <div class="section" id="supportSection">
+            <h3>Contact Support Requests</h3>
+            <table style="width:100%;border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th style="border-bottom:1px solid #a5b4fc;padding:6px;">Type</th>
+                        <th style="border-bottom:1px solid #a5b4fc;padding:6px;">Email</th>
+                        <th style="border-bottom:1px solid #a5b4fc;padding:6px;">User</th>
+                        <th style="border-bottom:1px solid #a5b4fc;padding:6px;">Message</th>
+                        <th style="border-bottom:1px solid #a5b4fc;padding:6px;">Time</th>
+                    </tr>
+                </thead>
+                <tbody id="supportTable"></tbody>
+            </table>
+        </div>
+
+        <div id="feedbackModal">
+          <div>
+            <button onclick="document.getElementById('feedbackModal').style.display='none'">&times;</button>
+            <h3 style="color:#6366f1;text-align:center;margin-bottom:18px;">All Feedback</h3>
+            <table id="modalFeedbackTable">
+              <thead>
+                <tr>
+                  <th style="border-bottom:1px solid #a5b4fc;padding:6px;">From</th>
+                  <th style="border-bottom:1px solid #a5b4fc;padding:6px;">To</th>
+                  <th style="border-bottom:1px solid #a5b4fc;padding:6px;">Rating</th>
+                  <th style="border-bottom:1px solid #a5b4fc;padding:6px;">Comment</th>
+                </tr>
+              </thead>
+              <tbody id="modalFeedbackTable"></tbody>
+            </table>
+          </div>
+        </div>
+    </div>
+
+    <script defer>
+        window.onload = function() {
+            // Only let admins in!
+            if (localStorage.getItem('userRole') !== 'admin') {
+                window.location.href = "index.html";
+            }
+            showSection('counselors'); // Show counselors by default
+
+            // Load counselors
+            fetch('http://localhost:3000/counselors')
+                .then(res => res.json())
+                .then(counselors => {
+                    document.getElementById('counselorTable').innerHTML = counselors.map(c =>
+                        `<tr>
+                            <td>${c.username}</td>
+                            <td>${c.name || ''}</td>
+                            <td>${c.email || ''}</td>
+                            <td>${c.active ? 'Active' : 'Inactive'}</td>
+                            <td>${c.active ? `<button class="remove" onclick="removeCounselor('${c.username}')">Remove</button>` : ''}</td>
+                        </tr>`
+                    ).join('');
+                });
+
+            // Load students
+            fetch('http://localhost:3000/students', {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+                .then(res => res.json())
+                .then(students => {
+                    document.getElementById('studentTable').innerHTML = students.map(s =>
+                        `<tr>
+                            <td>${s.username}</td>
+                            <td>${s.name || ''}</td>
+                            <td>${s.email || ''}</td>
+                            <td>${s.active !== false ? 'Active' : 'Inactive'}</td>
+                            <td>${s.active !== false ? `<button class="remove" onclick="removeStudent('${s.username}')">Remove</button>` : ''}</td>
+                        </tr>`
+                    ).join('');
+                });
+
+            // Load feedback into the table
+            fetch('http://localhost:3000/feedback')
+                .then(res => res.json())
+                .then(feedbacks => {
+                    document.getElementById('feedbackTable').innerHTML = feedbacks.map(f =>
+                        `<tr>
+                            <td style="padding:6px;">${f.fromUser}</td>
+                            <td style="padding:6px;">${f.toUser}</td>
+                            <td style="padding:6px;">${f.rating}</td>
+                            <td style="padding:6px;">${f.comment}</td>
+                        </tr>`
+                    ).join('');
+                });
+
+            // Load sessions
+            fetch('http://localhost:3000/sessions')
+                .then(res => res.json())
+                .then(sessions => {
+                    document.getElementById('sessionTable').innerHTML = sessions.map(s =>
+                        `<tr>
+                            <td>${s.student}</td>
+                            <td>${s.counselor}</td>
+                            <td>${s.date}</td>
+                            <td>${s.time}</td>
+                            <td>${s.reason || ''}</td>
+                        </tr>`
+                    ).join('');
+                });
+        };
+
+        function showSection(section) {
+            // Remove active from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+
+            // Show the selected section and highlight nav
+            if(section === 'counselors') {
+                document.querySelectorAll('.nav-btn')[0].classList.add('active');
+                document.getElementById('counselorsSection').classList.add('active');
+            } else if(section === 'students') {
+                document.querySelectorAll('.nav-btn')[1].classList.add('active');
+                document.getElementById('studentsSection').classList.add('active');
+            } else if(section === 'sessions') {
+                document.querySelectorAll('.nav-btn')[2].classList.add('active');
+                document.getElementById('sessionsSection').classList.add('active');
+            } else if(section === 'support') {
+                document.querySelectorAll('.nav-btn')[3].classList.add('active');
+                document.getElementById('supportSection').classList.add('active');
+                loadSupportRequests();
+            } else if(section === 'feedback') {
+                document.querySelectorAll('.nav-btn')[4].classList.add('active');
+                document.getElementById('feedbackSection').classList.add('active');
+                loadFeedback();
+            }
+        }
+
+        function loadFeedback() {
+            fetch('http://localhost:3000/feedback')
+                .then(res => res.json())
+                .then(feedbacks => {
+                    document.getElementById('feedbackTable').innerHTML = feedbacks.map(f =>
+                        `<tr>
+                            <td style="padding:6px;">${f.fromUser}</td>
+                            <td style="padding:6px;">${f.toUser}</td>
+                            <td style="padding:6px;">${f.rating}</td>
+                            <td style="padding:6px;">${f.comment}</td>
+                        </tr>`
+                    ).join('');
+                });
+        }
+
+        function loadSupportRequests() {
+            fetch('http://localhost:3000/support-requests')
+                .then(res => res.json())
+                .then(requests => {
+                    document.getElementById('supportTable').innerHTML = requests.map(r =>
+                        `<tr>
+                            <td style="padding:6px;">${r.type}</td>
+                            <td style="padding:6px;">${r.email}</td>
+                            <td style="padding:6px;">${r.user || ''}</td>
+                            <td style="padding:6px;">${r.message}</td>
+                            <td style="padding:6px;">${r.time ? new Date(r.time).toLocaleString() : ''}</td>
+                        </tr>`
+                    ).join('');
+                });
+        }
+
+        // Delete endpoints
+        function removeCounselor(username) {
+            if (!confirm("Remove this counselor?")) return;
+            fetch('http://localhost:3000/remove-counselor', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) location.reload();
+                else alert("Error removing counselor");
+            });
+        }
+
+        function removeStudent(username) {
+            if (!confirm("Remove this student?")) return;
+            fetch('http://localhost:3000/remove-student', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) location.reload();
+                else alert("Error removing student");
+            });
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

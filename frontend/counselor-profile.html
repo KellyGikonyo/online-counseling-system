@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counselor Profile</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f6fa; }
+        .profile-container { max-width: 400px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px #ccc; padding: 28px; }
+        label { display: block; margin-top: 12px; }
+        input, textarea { width: 100%; padding: 8px; margin-top: 4px; border-radius: 6px; border: 1px solid #a5b4fc; }
+        button { margin-top: 18px; padding: 10px 20px; background: #6366f1; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .leave-btn { background: #d32f2f; }
+        .success { color: #22c55e; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <h2>Your Profile</h2>
+        <form id="profileForm">
+            <label>Name</label>
+            <input type="text" name="name" autocomplete="name" required placeholder="Enter your full name" title="Full Name">
+            <label>Email</label>
+            <input type="email" name="email" autocomplete="email" required placeholder="Enter your email address" title="Email Address">
+            <label>Username</label>
+            <input type="text" name="username" autocomplete="username" required placeholder="Enter your username" title="Username">
+            <label>Password</label>
+            <input type="password" name="password" autocomplete="new-password" required placeholder="Enter your password" title="Password">
+            <label>Bio</label>
+            <textarea id="bio" title="Bio" placeholder="Tell us about yourself"></textarea>
+            <button type="submit">Update Profile</button>
+        </form>
+        <button class="leave-btn" onclick="leaveAccount()">Leave (Deactivate Account)</button>
+        <div id="profileMsg" class="success"></div>
+    </div>
+    <script>
+        const username = localStorage.getItem('username');
+        // Load profile
+        fetch(`http://localhost:3000/counselor-profile?username=${username}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('name').value = data.name || "";
+                document.getElementById('email').value = data.email || "";
+                document.getElementById('bio').value = data.bio || "";
+            });
+
+        // Update profile
+        document.getElementById('profileForm').onsubmit = function(e) {
+            e.preventDefault();
+            fetch('http://localhost:3000/counselor-profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username,
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    bio: document.getElementById('bio').value
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('profileMsg').innerText = data.success ? "Profile updated!" : "Update failed.";
+            });
+        };
+
+        // Leave (deactivate) account
+        function leaveAccount() {
+            if (!confirm("Are you sure you want to deactivate your account?")) return;
+            fetch('http://localhost:3000/counselor-leave', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.clear();
+                    alert("Account deactivated. You can re-register anytime.");
+                    window.location.href = "register.html";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

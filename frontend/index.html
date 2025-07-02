@@ -1,0 +1,304 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome | Student-Counselor Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background: linear-gradient(120deg, #6366f1 0%, #a5b4fc 100%);
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .header {
+      margin-top: 36px;
+      color: #fff;
+      text-align: center;
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 12px #6366f1;
+    }
+    .icon-row {
+      display: flex;
+      gap: 36px;
+      margin: 48px 0 0 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .icon-btn {
+      background: #fff;
+      border: none;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(99,102,241,0.13);
+      padding: 18px 22px 12px 22px;
+      width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.2s;
+      margin-bottom: 8px;
+    }
+    .icon-btn.selected, .icon-btn:hover {
+      box-shadow: 0 4px 24px rgba(99,102,241,0.22);
+      transform: translateY(-4px) scale(1.04);
+      background: #f3f6fa;
+    }
+    .icon-img {
+      font-size: 2.2rem;
+      margin-bottom: 6px;
+      color: #6366f1;
+    }
+    .icon-label {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #6366f1;
+      margin-bottom: 2px;
+      letter-spacing: 0.5px;
+    }
+    .login-section {
+      width: 100%;
+      max-width: 340px;
+      margin: 30px auto 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(99,102,241,0.13);
+      padding: 28px 22px 18px 22px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 0.4s;
+    }
+    .login-section.active {
+      display: flex;
+    }
+    label {
+      display: block;
+      margin-bottom: 4px;
+      color: #374151;
+      font-weight: 500;
+      margin-top: 10px;
+    }
+    input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1.5px solid #a5b4fc;
+      border-radius: 7px;
+      font-size: 1rem;
+      margin-bottom: 8px;
+      background: #f3f6fa;
+      transition: border-color 0.2s;
+    }
+    input:focus {
+      border-color: #6366f1;
+      outline: none;
+      background: #fff;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+      box-shadow: 0 2px 8px rgba(99,102,241,0.09);
+    }
+    button:hover {
+      background: #4f46e5;
+    }
+    .login-msg {
+      margin-top: 8px;
+      text-align: center;
+      font-weight: 500;
+      min-height: 18px;
+    }
+    .register-link {
+      margin-top: 10px;
+      font-size: 0.97rem;
+      color: #6366f1;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    @media (max-width: 1100px) {
+      .icon-row { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">Welcome to the Student-Counselor Portal</div>
+  <div class="icon-row">
+    <!-- Student Card -->
+    <div class="icon-btn" id="studentBtn">
+      <div class="icon-img">🎓</div>
+      <div class="icon-label">Student Login</div>
+    </div>
+    <!-- Counselor Card -->
+    <div class="icon-btn" id="counselorBtn">
+      <div class="icon-img">🧑‍🏫</div>
+      <div class="icon-label">Counselor Login</div>
+    </div>
+    <!-- Admin Card -->
+    <div class="icon-btn" id="adminBtn">
+      <div class="icon-img">🛡️</div>
+      <div class="icon-label">Admin Login</div>
+    </div>
+  </div>
+  <!-- Student Login Section -->
+  <div class="login-section" id="studentLoginSection">
+    <form id="studentLoginForm" autocomplete="off">
+      <label for="studentUsername">Username</label>
+      <input type="text" id="studentUsername" autocomplete="username" required>
+      <label for="studentPassword">Password</label>
+      <input type="password" id="studentPassword" autocomplete="current-password" required>
+      <button type="submit">Login as Student</button>
+      <div id="studentLoginMsg" class="login-msg"></div>
+    </form>
+    <div class="register-link" onclick="window.location.href='register.html'">Create a student account</div>
+  </div>
+  <!-- Counselor Login Section -->
+  <div class="login-section" id="counselorLoginSection">
+    <form id="counselorLoginForm" autocomplete="off">
+      <label for="counselorUsername">Username</label>
+      <input type="text" id="counselorUsername" autocomplete="username" required>
+      <label for="counselorPassword">Password</label>
+      <input type="password" id="counselorPassword" autocomplete="current-password" required>
+      <button type="submit">Login as Counselor</button>
+      <div id="counselorLoginMsg" class="login-msg"></div>
+    </form>
+    <div class="register-link" onclick="window.location.href='register.html'">Create a counselor account</div>
+  </div>
+  <!-- Admin Login Section -->
+  <div class="login-section" id="adminLoginSection">
+    <form id="adminLoginForm" autocomplete="off">
+      <label for="adminUsername">Username</label>
+      <input type="text" id="adminUsername" autocomplete="username" required>
+      <label for="adminPassword">Password</label>
+      <input type="password" id="adminPassword" autocomplete="current-password" required>
+      <button type="submit">Login as Admin</button>
+      <div id="adminLoginMsg" class="login-msg"></div>
+    </form>
+  </div>
+  <script>
+    // Show login section based on button click
+    document.getElementById('studentBtn').onclick = function() {
+      document.getElementById('studentLoginSection').classList.add('active');
+      document.getElementById('counselorLoginSection').classList.remove('active');
+      document.getElementById('adminLoginSection').classList.remove('active');
+    };
+    document.getElementById('counselorBtn').onclick = function() {
+      document.getElementById('counselorLoginSection').classList.add('active');
+      document.getElementById('studentLoginSection').classList.remove('active');
+      document.getElementById('adminLoginSection').classList.remove('active');
+    };
+    document.getElementById('adminBtn').onclick = function() {
+      document.getElementById('adminLoginSection').classList.add('active');
+      document.getElementById('studentLoginSection').classList.remove('active');
+      document.getElementById('counselorLoginSection').classList.remove('active');
+    };
+    // Student Login
+    document.getElementById('studentLoginForm').onsubmit = function(e) {
+      e.preventDefault();
+      const username = document.getElementById('studentUsername').value;
+      const password = document.getElementById('studentPassword').value;
+      fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
+      .then(res => res.json())
+      .then(result => {
+        const msg = document.getElementById('studentLoginMsg');
+        if (result.success && result.role === "student") {
+          localStorage.setItem('username', result.username);
+          localStorage.setItem('userRole', result.role);
+          localStorage.setItem('name', result.name);
+          localStorage.setItem('token', result.token); // <-- Store the token here
+          msg.style.color = "#22c55e";
+          msg.innerText = "Login successful! Redirecting...";
+          setTimeout(() => window.location.href = "student-dashboard.html", 1200);
+        } else {
+          msg.style.color = "#d32f2f";
+          msg.innerText = "Login failed: " + (result.message || "Not a student account.");
+        }
+      });
+    };
+    // Counselor Login
+    document.getElementById('counselorLoginForm').onsubmit = function(e) {
+      e.preventDefault();
+      const username = document.getElementById('counselorUsername').value;
+      const password = document.getElementById('counselorPassword').value;
+      fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
+      .then(res => res.json())
+      .then(result => {
+        const msg = document.getElementById('counselorLoginMsg');
+        if (result.success && result.role === "counselor") {
+          localStorage.setItem('username', result.username);
+          localStorage.setItem('userRole', result.role);
+          localStorage.setItem('name', result.name);
+          msg.style.color = "#22c55e";
+          msg.innerText = "Login successful! Redirecting...";
+          setTimeout(() => window.location.href = "counselor-dashboard.html", 1200);
+        } else {
+          msg.style.color = "#d32f2f";
+          msg.innerText = "Login failed: " + (result.message || "Not a counselor account.");
+        }
+      });
+    };
+    // Admin Login
+    document.getElementById('adminLoginForm').onsubmit = function(e) {
+      e.preventDefault();
+      const username = document.getElementById('adminUsername').value;
+      const password = document.getElementById('adminPassword').value;
+      fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
+      .then(res => res.json())
+      .then(result => {
+        const msg = document.getElementById('adminLoginMsg');
+        if (result.success && result.role === "admin") {
+          localStorage.setItem('username', result.username);
+          localStorage.setItem('userRole', result.role);
+          localStorage.setItem('name', result.name);
+          msg.style.color = "#22c55e";
+          msg.innerText = "Login successful! Redirecting...";
+          setTimeout(() => window.location.href = "admin-dashboard.html", 1200);
+        } else {
+          msg.style.color = "#d32f2f";
+          msg.innerText = "Login failed: " + (result.message || "Not an admin account.");
+        }
+      });
+    };
+    // Fetch students (example usage)
+    fetch('http://localhost:3000/students', {
+      headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
+    })
+    .then(res => res.json())
+    .then(students => {
+        console.log(students); // Handle the students data as needed
+    });
+  </script>
+  <footer style="width:100%;background:#6366f1;color:#fff;text-align:center;padding:18px 0 12px 0;position:fixed;left:0;bottom:0;font-size:1rem;letter-spacing:0.5px;">
+    &copy; 2025 Student-Counselor Portal &mdash; All rights reserved.
+  </footer>
+</body>
+</html>

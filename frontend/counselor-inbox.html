@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Counselor Inbox</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f6fa; margin: 0; }
+        .chat-container { max-width: 600px; margin: 0 auto; background: #fff; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
+        .chat-header { background: #6366f1; color: #fff; padding: 18px 20px 10px 20px; border-radius: 0 0 18px 18px; }
+        .chat-thread-list { background: #f1f5ff; padding: 10px 0; border-bottom: 1px solid #e5e7eb; display: flex; overflow-x: auto; gap: 10px; }
+        .thread-btn { background: #fff; border: 1.5px solid #a5b4fc; border-radius: 20px; padding: 8px 18px; margin: 0 0 0 10px; cursor: pointer; font-weight: 600; color: #6366f1; }
+        .thread-btn.active, .thread-btn:hover { background: #6366f1; color: #fff; }
+        .chat-messages { flex: 1 1 auto; padding: 18px 10px 90px 10px; overflow-y: auto; background: #f3f6fa; display: flex; flex-direction: column; }
+        .msg-row { display: flex; margin-bottom: 12px; align-items: flex-end; }
+        .msg-bubble { max-width: 70%; padding: 12px 16px; border-radius: 18px; font-size: 1.05rem; position: relative; word-break: break-word; box-shadow: 0 2px 8px rgba(99,102,241,0.06);}
+        .msg-counselor { background: #e0e7ff; color: #222; border-bottom-left-radius: 4px; margin-right: auto; }
+        .msg-student { background: #6366f1; color: #fff; border-bottom-right-radius: 4px; margin-left: auto; }
+        .msg-meta { font-size: 0.85em; color: #888; margin-top: 2px; text-align: right; }
+        .msg-attachments { margin-top: 6px; }
+        .msg-attachments a { display: inline-block; margin-right: 8px; color: #6366f1; text-decoration: underline; font-size: 0.95em; }
+        .msg-status { font-size: 0.9em; margin-left: 6px; color: #22c55e; }
+        .typing-indicator { font-size: 1em; color: #6366f1; margin-bottom: 10px; margin-left: 10px; display: none; }
+        .chat-input-bar { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid #e5e7eb; padding: 12px 10px 12px 10px; display: flex; align-items: center; gap: 8px; max-width: 600px; margin: 0 auto; }
+        .chat-input-bar input[type="text"] { flex: 1 1 auto; padding: 10px; border-radius: 8px; border: 1px solid #a5b4fc; font-size: 1rem; }
+        .chat-input-bar input[type="file"] { display: none; }
+        .emoji-btn, .attach-btn, .send-btn { background: none; border: none; font-size: 1.4em; cursor: pointer; color: #6366f1; }
+        .emoji-btn:hover, .attach-btn:hover, .send-btn:hover { color: #374151; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Counselor Inbox</h2>
+        </div>
+        <div class="chat-thread-list" id="threadList"></div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="typing-indicator" id="typingIndicator">
+            Student is typing...
+        </div>
+        <form class="chat-input-bar" id="chatInputBar" autocomplete="off">
+            <button type="button" class="emoji-btn" title="Add Emoji" onclick="toggleEmojiPicker()">😊</button>
+            <input type="text" id="msgInput" placeholder="Type a message..." required>
+            <label for="fileInput" class="attach-btn" title="Attach file">📎</label>
+            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
+            <button type="submit" class="send-btn" title="Send">➤</button>
+        </form>
+    </div>
+    <script>
+        // Demo: set username in localStorage for testing
+        if (!localStorage.getItem('username')) localStorage.setItem('username', 'counselor1');
+        const username = localStorage.getItem('username');
+        const socket = io('http://localhost:3000');
+        socket.emit('join', { username });
+
+        let currentThread = null;
+        let threads = [];
+        let messagesMap = {};
+        let pendingAttachment = null;
+
+        function loadThreads() {
+            fetch(`http://localhost:3000/threads?user=${username}`)
+                .then(res => res.json())
+                .then(data => {
+                    threads = data;
+                    if (threads.length > 0) {
+                        currentThread = threads[0].id;
+                        renderThreads();
+                        loadMessages(currentThread);
+                    }
+                });
+        }
+
+        function renderThreads() {
+            const threadList = document.getElementById('threadList');
+            threadList.innerHTML = threads.map(t =>
+                `<button class="thread-btn${t.id === currentThread ? ' active' : ''}" onclick="switchThread(${t.id})">
+                    ${t.name}
+                </button>`
+            ).join('');
+        }
+
+        function switchThread(id) {
+            currentThread = id;
+            renderThreads();
+            loadMessages(id);
+            socket.emit('markRead', { threadId: id, user: username });
+        }
+
+        function loadMessages(threadId) {
+            fetch(`http://localhost:3000/messages/${threadId}`)
+                .then(res => res.json())
+                .then(msgs => {
+                    messagesMap[threadId] = msgs;
+                    renderMessages();
+                });
+        }
+
+        function renderMessages() {
+            const chat = document.getElementById('chatMessages');
+            const msgs = messagesMap[currentThread] || [];
+            chat.innerHTML = msgs.map(m => `
+                <div class="msg-row" style="justify-content:${m.from === username ? 'flex-start' : 'flex-end'};">
+                    <div class="msg-bubble ${m.from === username ? 'msg-counselor' : 'msg-student'}">
+                        ${m.text}
+                        ${m.attachments && m.attachments.length ? `<div class="msg-attachments">${m.attachments.map(a => `<a href="${a.url}" target="_blank">${a.name}</a>`).join('')}</div>` : ""}
+                        <div class="msg-meta">
+                            ${m.time}
+                            ${m.read ? '<span class="msg-status">✔✔</span>' : '<span class="msg-status" style="color:#888;">✔</span>'}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        // Emoji picker (demo)
+        function toggleEmojiPicker() {
+            const input = document.getElementById('msgInput');
+            input.value += " 😊";
+            input.focus();
+        }
+
+        // Attachments
+        document.getElementById('fileInput').addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+            pendingAttachment = { name: file.name, url: "#" };
+            alert("Attachment ready: " + file.name);
+        });
+
+        // Typing indicator
+        let typingTimeout;
+        document.getElementById('msgInput').addEventListener('input', function() {
+            socket.emit('typing', { threadId: currentThread, from: username });
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                socket.emit('stopTyping', { threadId: currentThread, from: username });
+            }, 1200);
+        });
+
+        socket.on('showTyping', ({ threadId, from }) => {
+            if (threadId === currentThread && from !== username) {
+                document.getElementById('typingIndicator').style.display = "block";
+            }
+        });
+        socket.on('hideTyping', ({ threadId, from }) => {
+            if (threadId === currentThread && from !== username) {
+                document.getElementById('typingIndicator').style.display = "none";
+            }
+        });
+
+        // Send message
+        document.getElementById('chatInputBar').onsubmit = function(e) {
+            e.preventDefault();
+            const input = document.getElementById('msgInput');
+            if ((!input.value.trim() && !pendingAttachment) || !currentThread) return;
+            const to = threads.find(t => t.id === currentThread).users.find(u => u !== username);
+            const msg = {
+                threadId: currentThread,
+                from: username,
+                to: to,
+                text: input.value,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                attachments: pendingAttachment ? [pendingAttachment] : [],
+                read: false
+            };
+            socket.emit('sendMessage', msg);
+            input.value = "";
+            pendingAttachment = null;
+            document.getElementById('fileInput').value = "";
+        };
+
+        // Real-time receive
+        socket.on('newMessage', (msg) => {
+            if (!messagesMap[msg.threadId]) messagesMap[msg.threadId] = [];
+            messagesMap[msg.threadId].push(msg);
+            if (msg.threadId === currentThread) renderMessages();
+        });
+
+        socket.on('messagesRead', ({ threadId }) => {
+            if (messagesMap[threadId]) {
+                messagesMap[threadId].forEach(m => m.read = true);
+                if (threadId === currentThread) renderMessages();
+            }
+        });
+
+        loadThreads();
+    </script>
+</body>
+</html>

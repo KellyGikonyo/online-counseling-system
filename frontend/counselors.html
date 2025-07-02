@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>All Counselors</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f6fa; margin: 0; padding: 0; }
+        .dashboard-nav { display: flex; justify-content: center; gap: 18px; margin: 24px 0 0 0;}
+        .nav-btn {
+            display: inline-block;
+            padding: 10px 24px;
+            margin: 0 8px 8px 0;
+            background: #6366f1;
+            color: #fff;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .nav-btn:hover { background: #374151; }
+        .logout-btn { background: #d32f2f; }
+        .logout-btn:hover { background: #b71c1c; }
+        .counselor-list { max-width: 900px; margin: 40px auto; display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; }
+        .counselor-card { background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(60,90,180,0.08); padding: 20px 18px; width: 260px; text-align: left; position: relative; }
+        .counselor-pic { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #6366f1; margin-bottom: 10px;}
+        .counselor-name { color: #6366f1; font-size: 1.2rem; font-weight: 700; margin-bottom: 2px;}
+        .counselor-info { font-size: 0.98rem; color: #374151; margin-bottom: 6px;}
+        .inbox-btn {
+            display: inline-block;
+            padding: 8px 18px;
+            background: #22c55e;
+            color: #fff;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: background 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .inbox-btn:hover { background: #16a34a; }
+        footer { margin-top: 40px; padding: 14px 0 8px 0; color: #888; background: rgba(255,255,255,0.25); font-size: 1rem; letter-spacing: 1px; box-shadow: 0 -2px 16px rgba(0,0,0,0.03); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);}
+        .counselors-title { text-align: center; color: #6366f1; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-nav">
+        <a href="counselor-dashboard.html" class="nav-btn">Dashboard</a>
+        <a href="logout.html" class="nav-btn logout-btn">Logout</a>
+        <a href="counselors.html" class="nav-btn">All Counselors</a>
+        <a href="logout.html" class="nav-btn logout-btn">Logout</a>
+    <h2 class="counselors-title">All Counselors</h2>
+    <h2 style="text-align:center;color:#6366f1;">All Counselors</h2>
+    <div class="counselor-list" id="counselorList">
+       
+       
+        
+    
+    <footer>
+        <p>&copy; 2025 Josh - Online Guidance and Counseling System</p>
+    </footer>
+<script>
+function openInbox(counselorUsername) {
+    localStorage.setItem('selectedCounselor', counselorUsername);
+    window.location.href = 'counselor-inbox.html';
+}
+
+function renderCounselors(counselors) {
+    const list = document.getElementById('counselorList');
+    if (!counselors.length) {
+        list.innerHTML = '<p style="color:#888;">No counselors available at the moment.</p>';
+        return;
+    }
+    list.innerHTML = counselors.map(c => `
+        <div class="counselor-card">
+            <img src="${c.photo}" alt="Counselor Photo" class="counselor-pic">
+            <div class="counselor-name">${c.name}</div>
+            <div class="counselor-info"><strong>Email:</strong> ${c.email}</div>
+            <div class="counselor-info"><strong>Specialization:</strong> ${c.specialization}</div>
+            <div class="counselor-info"><strong>Experience:</strong> ${c.experience}</div>
+            <div class="counselor-info"><strong>Bio:</strong> ${c.bio}</div>
+            <button class="inbox-btn" onclick="openInbox('${c.username}')">Inbox</button>
+        </div>
+    `).join('');
+}
+
+function loadCounselors() {
+    fetch('http://localhost:3000/counselors')
+        .then(res => res.json())
+        .then(counselors => { renderCounselors(counselors); })
+        .catch(() => {
+            renderCounselors([]);
+        });
+}
+
+loadCounselors();
+</script>
+</body>
+</html>

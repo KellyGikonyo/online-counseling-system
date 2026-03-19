@@ -277,6 +277,7 @@
           localStorage.setItem('username', result.username);
           localStorage.setItem('userRole', result.role);
           localStorage.setItem('name', result.name);
+          localStorage.setItem('token', result.token); // <-- Add this line
           msg.style.color = "#22c55e";
           msg.innerText = "Login successful! Redirecting...";
           setTimeout(() => window.location.href = "admin-dashboard.html", 1200);

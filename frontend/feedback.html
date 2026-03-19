@@ -184,7 +184,10 @@
             document.getElementById('submitBtn').disabled = true;
             fetch('http://localhost:3000/feedback', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
                 body: JSON.stringify({
                     communication: ratings.communication,
                     helpfulness: ratings.helpfulness,

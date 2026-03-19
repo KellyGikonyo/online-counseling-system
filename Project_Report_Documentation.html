@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Counseling System - Project Report Documentation</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            line-height: 1.6;
+            margin: 2.54cm;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            font-size: 24pt;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            font-size: 18pt;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+            padding-left: 10px;
+        }
+        h3 {
+            color: #2c3e50;
+            font-size: 14pt;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        h4 {
+            color: #34495e;
+            font-size: 12pt;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+        p {
+            text-align: justify;
+            margin-bottom: 12px;
+        }
+        ul, ol {
+            margin-bottom: 15px;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 10pt;
+            overflow-x: auto;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .table-container {
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+        .executive-summary {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .tech-stack {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        .tech-category {
+            flex: 1;
+            margin: 0 10px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Online Counseling System</h1>
+    <h1 style="font-size: 18pt; border: none; margin-top: 0;">Project Report Documentation</h1>
+
+    <div class="executive-summary">
+        <h2 style="border: none; margin-top: 0;">Executive Summary</h2>
+        <p>The Online Counseling System is a comprehensive web-based platform designed to facilitate communication and session management between students and counselors in an educational environment. The system provides secure authentication, real-time messaging, session booking, feedback mechanisms, and administrative oversight capabilities.</p>
+        <p><strong>Project Type:</strong> Full-stack Web Application</p>
+        <p><strong>Development Period:</strong> Academic Project</p>
+        <p><strong>Target Users:</strong> Students, Counselors, and Administrators</p>
+    </div>
+
+    <h2>1. Project Overview</h2>
+    
+    <h3>1.1 Project Description</h3>
+    <p>The Online Counseling System is a digital platform that bridges the gap between students seeking guidance and counselors providing support services. The system eliminates geographical barriers and provides a secure, efficient way for students to access counseling services remotely.</p>
+
+    <h3>1.2 Project Objectives</h3>
+    <ul>
+        <li>Provide a secure platform for student-counselor communication</li>
+        <li>Enable efficient session booking and management</li>
+        <li>Implement real-time messaging capabilities</li>
+        <li>Establish feedback and rating systems</li>
+        <li>Provide comprehensive administrative oversight</li>
+        <li>Ensure data privacy and security</li>
+    </ul>
+
+    <h3>1.3 Target Audience</h3>
+    <ul>
+        <li><strong>Students:</strong> Primary users seeking counseling services</li>
+        <li><strong>Counselors:</strong> Professional counselors providing guidance</li>
+        <li><strong>Administrators:</strong> System managers overseeing operations</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>2. System Architecture</h2>
+
+    <h3>2.1 Technology Stack</h3>
+    <div class="tech-stack">
+        <div class="tech-category">
+            <h4>Frontend</h4>
+            <ul>
+                <li>HTML5</li>
+                <li>CSS3</li>
+                <li>JavaScript (ES6+)</li>
+                <li>Socket.io Client</li>
+            </ul>
+        </div>
+        <div class="tech-category">
+            <h4>Backend</h4>
+            <ul>
+                <li>Node.js</li>
+                <li>Express.js</li>
+                <li>Socket.io</li>
+                <li>SQLite3</li>
+            </ul>
+        </div>
+        <div class="tech-category">
+            <h4>Security</h4>
+            <ul>
+                <li>JWT Authentication</li>
+                <li>bcrypt Password Hashing</li>
+                <li>CORS Protection</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>2.2 System Architecture Diagram</h3>
+    <div class="code-block">
+        ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+        │   Frontend      │    │   Backend       │    │   Database      │
+        │   (HTML/CSS/JS) │◄──►│   (Node.js/     │◄──►│   (SQLite3)     │
+        │                 │    │    Express)     │    │                 │
+        └─────────────────┘    └─────────────────┘    └─────────────────┘
+                │                       │
+                │                       │
+        ┌─────────────────┐    ┌─────────────────┐
+        │   Real-time     │    │   Authentication│
+        │   Messaging     │    │   (JWT/bcrypt)  │
+        │   (Socket.io)   │    │                 │
+        └─────────────────┘    └─────────────────┘
+    </div>
+
+    <h3>2.3 Database Schema</h3>
+    <p>The system uses SQLite3 database with the following main tables:</p>
+    
+    <h4>Users Table</h4>
+    <div class="code-block">
+        CREATE TABLE users (
+            username TEXT PRIMARY KEY,
+            password TEXT,
+            role TEXT,
+            name TEXT,
+            email TEXT,
+            active INTEGER DEFAULT 1
+        );
+    </div>
+
+    <h4>Sessions Table</h4>
+    <div class="code-block">
+        CREATE TABLE sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student TEXT,
+            counselor TEXT,
+            date TEXT,
+            time TEXT,
+            reason TEXT
+        );
+    </div>
+
+    <h4>Feedback Table</h4>
+    <div class="code-block">
+        CREATE TABLE feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fromUser TEXT,
+            toUser TEXT,
+            rating INTEGER,
+            comment TEXT
+        );
+    </div>
+
+    <h4>Messages Table</h4>
+    <div class="code-block">
+        CREATE TABLE messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            threadId INTEGER,
+            fromUser TEXT,
+            toUser TEXT,
+            text TEXT,
+            time TEXT,
+            read INTEGER DEFAULT 0,
+            attachments TEXT
+        );
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>3. Functional Requirements</h2>
+
+    <h3>3.1 User Authentication & Authorization</h3>
+    <ul>
+        <li><strong>Multi-role Login:</strong> Separate login interfaces for students, counselors, and administrators</li>
+        <li><strong>Secure Authentication:</strong> JWT-based token system with bcrypt password hashing</li>
+        <li><strong>Role-based Access Control:</strong> Different permissions and interfaces based on user role</li>
+        <li><strong>Session Management:</strong> Automatic token expiration and secure logout</li>
+    </ul>
+
+    <h3>3.2 Student Features</h3>
+    <ul>
+        <li><strong>Dashboard:</strong> Overview of upcoming sessions and recent activities</li>
+        <li><strong>Counselor Discovery:</strong> Browse and view available counselors</li>
+        <li><strong>Session Booking:</strong> Schedule counseling sessions with preferred counselors</li>
+        <li><strong>Real-time Messaging:</strong> Communicate with counselors through instant messaging</li>
+        <li><strong>Feedback System:</strong> Rate and provide feedback for counseling sessions</li>
+        <li><strong>Profile Management:</strong> Update personal information and preferences</li>
+    </ul>
+
+    <h3>3.3 Counselor Features</h3>
+    <ul>
+        <li><strong>Professional Dashboard:</strong> Manage sessions, view assigned students</li>
+        <li><strong>Session Management:</strong> View and manage scheduled sessions</li>
+        <li><strong>Student Communication:</strong> Real-time messaging with assigned students</li>
+        <li><strong>Profile Management:</strong> Update professional information and availability</li>
+        <li><strong>Leave Management:</strong> Request leave or deactivate account</li>
+    </ul>
+
+    <h3>3.4 Administrative Features</h3>
+    <ul>
+        <li><strong>User Management:</strong> View, add, and remove students and counselors</li>
+        <li><strong>System Monitoring:</strong> Track sessions, feedback, and system usage</li>
+        <li><strong>Support Requests:</strong> Handle contact form submissions</li>
+        <li><strong>Data Analytics:</strong> View feedback ratings and system statistics</li>
+    </ul>
+
+    <h3>3.5 Communication Features</h3>
+    <ul>
+        <li><strong>Real-time Messaging:</strong> Instant communication using Socket.io</li>
+        <li><strong>Message Threading:</strong> Organized conversation threads</li>
+        <li><strong>Read Receipts:</strong> Message status tracking</li>
+        <li><strong>File Attachments:</strong> Support for document sharing</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>4. Technical Implementation</h2>
+
+    <h3>4.1 Backend Implementation</h3>
+    
+    <h4>Server Setup</h4>
+    <div class="code-block">
+        const express = require('express');
+        const cors = require('cors');
+        const socketio = require('socket.io');
+        const bcrypt = require('bcrypt');
+        const jwt = require('jsonwebtoken');
+        
+        const app = express();
+        const server = http.createServer(app);
+        const io = socketio(server);
+    </div>
+
+    <h4>Authentication Middleware</h4>
+    <div class="code-block">
+        function authenticateToken(req, res, next) {
+            const authHeader = req.headers['authorization'];
+            const token = authHeader && authHeader.split(' ')[1];
+            
+            if (!token) return res.sendStatus(401);
+            
+            jwt.verify(token, JWT_SECRET, (err, user) => {
+                if (err) return res.sendStatus(403);
+                req.user = user;
+                next();
+            });
+        }
+    </div>
+
+    <h4>Password Security</h4>
+    <div class="code-block">
+        const SALT_ROUNDS = 10;
+        const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+        const match = await bcrypt.compare(password, user.password);
+    </div>
+
+    <h3>4.2 Frontend Implementation</h3>
+    
+    <h4>Responsive Design</h4>
+    <p>The frontend implements a responsive design using CSS3 with:</p>
+    <ul>
+        <li>Flexbox and Grid layouts for responsive positioning</li>
+        <li>Media queries for mobile device compatibility</li>
+        <li>Modern CSS features like gradients and shadows</li>
+        <li>Consistent color scheme and typography</li>
+    </ul>
+
+    <h4>Real-time Communication</h4>
+    <div class="code-block">
+        const socket = io();
+        
+        socket.on('message', (data) => {
+            // Handle incoming messages
+            displayMessage(data);
+        });
+        
+        function sendMessage(text) {
+            socket.emit('message', {
+                from: currentUser,
+                to: recipient,
+                text: text,
+                time: new Date().toISOString()
+            });
+        }
+    </div>
+
+    <h3>4.3 Security Implementation</h3>
+    <ul>
+        <li><strong>Password Hashing:</strong> bcrypt with 10 salt rounds</li>
+        <li><strong>JWT Tokens:</strong> 2-hour expiration with secure secret</li>
+        <li><strong>CORS Protection:</strong> Cross-origin resource sharing configuration</li>
+        <li><strong>Input Validation:</strong> Server-side validation for all user inputs</li>
+        <li><strong>SQL Injection Prevention:</strong> Parameterized queries</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>5. User Interface Design</h2>
+
+    <h3>5.1 Design Principles</h3>
+    <ul>
+        <li><strong>User-Centered Design:</strong> Interface designed around user needs and workflows</li>
+        <li><strong>Accessibility:</strong> High contrast colors and readable typography</li>
+        <li><strong>Responsive Design:</strong> Works seamlessly across desktop and mobile devices</li>
+        <li><strong>Consistent Navigation:</strong> Uniform navigation patterns across all pages</li>
+    </ul>
+
+    <h3>5.2 Color Scheme</h3>
+    <ul>
+        <li><strong>Primary Color:</strong> #6366f1 (Indigo)</li>
+        <li><strong>Secondary Color:</strong> #a5b4fc (Light Indigo)</li>
+        <li><strong>Background:</strong> #f3f6fa (Light Gray)</li>
+        <li><strong>Text:</strong> #374151 (Dark Gray)</li>
+        <li><strong>Error:</strong> #e11d48 (Red)</li>
+    </ul>
+
+    <h3>5.3 Key Interface Components</h3>
+    
+    <h4>Login Interface</h4>
+    <p>The main landing page features three distinct login options with intuitive icons and smooth transitions between different user types.</p>
+
+    <h4>Dashboard Layouts</h4>
+    <ul>
+        <li><strong>Student Dashboard:</strong> Session overview, counselor list, and quick actions</li>
+        <li><strong>Counselor Dashboard:</strong> Session management, student list, and communication tools</li>
+        <li><strong>Admin Dashboard:</strong> Tabbed interface for user management and system monitoring</li>
+    </ul>
+
+    <h4>Messaging Interface</h4>
+    <p>Real-time messaging with threaded conversations, read receipts, and file attachment capabilities.</p>
+
+    <h2>6. Database Design & Management</h2>
+
+    <h3>6.1 Database Architecture</h3>
+    <p>The system uses SQLite3 as the database engine, chosen for its:</p>
+    <ul>
+        <li>Lightweight nature and zero-configuration setup</li>
+        <li>ACID compliance for data integrity</li>
+        <li>Single file storage for easy deployment</li>
+        <li>Excellent performance for small to medium applications</li>
+    </ul>
+
+    <h3>6.2 Data Relationships</h3>
+    <ul>
+        <li><strong>Users → Sessions:</strong> One-to-many relationship between users and sessions</li>
+        <li><strong>Users → Messages:</strong> Many-to-many relationship through message threads</li>
+        <li><strong>Users → Feedback:</strong> Many-to-many relationship for rating system</li>
+    </ul>
+
+    <h3>6.3 Data Integrity</h3>
+    <ul>
+        <li>Primary key constraints on all tables</li>
+        <li>Foreign key relationships maintained through application logic</li>
+        <li>Soft delete implementation (active flag) for user management</li>
+        <li>Input validation and sanitization</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>7. API Documentation</h2>
+
+    <h3>7.1 Authentication Endpoints</h3>
+    
+    <table>
+        <tr>
+            <th>Endpoint</th>
+            <th>Method</th>
+            <th>Description</th>
+            <th>Parameters</th>
+        </tr>
+        <tr>
+            <td>/register</td>
+            <td>POST</td>
+            <td>User registration</td>
+            <td>username, password, role, name, email</td>
+        </tr>
+        <tr>
+            <td>/login</td>
+            <td>POST</td>
+            <td>User authentication</td>
+            <td>username, password</td>
+        </tr>
+    </table>
+
+    <h3>7.2 User Management Endpoints</h3>
+    
+    <table>
+        <tr>
+            <th>Endpoint</th>
+            <th>Method</th>
+            <th>Description</th>
+            <th>Authentication</th>
+        </tr>
+        <tr>
+            <td>/counselors</td>
+            <td>GET</td>
+            <td>List all active counselors</td>
+            <td>Required</td>
+        </tr>
+        <tr>
+            <td>/students</td>
+            <td>GET</td>
+            <td>List all active students</td>
+            <td>Required</td>
+        </tr>
+        <tr>
+            <td>/remove-counselor</td>
+            <td>POST</td>
+            <td>Deactivate counselor account</td>
+            <td>Admin only</td>
+        </tr>
+        <tr>
+            <td>/remove-student</td>
+            <td>POST</td>
+            <td>Deactivate student account</td>
+            <td>Admin only</td>
+        </tr>
+    </table>
+
+    <h3>7.3 Session Management Endpoints</h3>
+    
+    <table>
+        <tr>
+            <th>Endpoint</th>
+            <th>Method</th>
+            <th>Description</th>
+            <th>Parameters</th>
+        </tr>
+        <tr>
+            <td>/book-session</td>
+            <td>POST</td>
+            <td>Schedule new session</td>
+            <td>student, counselor, date, time, reason</td>
+        </tr>
+        <tr>
+            <td>/sessions</td>
+            <td>GET</td>
+            <td>Retrieve sessions</td>
+            <td>student, counselor (optional)</td>
+        </tr>
+    </table>
+
+    <h3>7.4 Communication Endpoints</h3>
+    
+    <table>
+        <tr>
+            <th>Endpoint</th>
+            <th>Method</th>
+            <th>Description</th>
+            <th>Parameters</th>
+        </tr>
+        <tr>
+            <td>/messages</td>
+            <td>GET</td>
+            <td>Get conversation messages</td>
+            <td>threadId</td>
+        </tr>
+        <tr>
+            <td>/send-message</td>
+            <td>POST</td>
+            <td>Send new message</td>
+            <td>threadId, from, to, text</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <h2>8. Security Features</h2>
+
+    <h3>8.1 Authentication Security</h3>
+    <ul>
+        <li><strong>Password Hashing:</strong> bcrypt with 10 salt rounds for secure password storage</li>
+        <li><strong>JWT Tokens:</strong> Stateless authentication with 2-hour expiration</li>
+        <li><strong>Role-based Access:</strong> Granular permissions based on user roles</li>
+        <li><strong>Session Management:</strong> Secure token storage and automatic cleanup</li>
+    </ul>
+
+    <h3>8.2 Data Protection</h3>
+    <ul>
+        <li><strong>Input Validation:</strong> Server-side validation for all user inputs</li>
+        <li><strong>SQL Injection Prevention:</strong> Parameterized queries throughout the application</li>
+        <li><strong>XSS Protection:</strong> Output encoding and sanitization</li>
+        <li><strong>CORS Configuration:</strong> Controlled cross-origin resource sharing</li>
+    </ul>
+
+    <h3>8.3 Privacy Measures</h3>
+    <ul>
+        <li><strong>Data Minimization:</strong> Only necessary data is collected and stored</li>
+        <li><strong>Access Control:</strong> Users can only access their own data</li>
+        <li><strong>Audit Trail:</strong> Message timestamps and read receipts for accountability</li>
+        <li><strong>Soft Deletes:</strong> Data retention through active/inactive flags</li>
+    </ul>
+
+    <h2>9. Testing Strategy</h2>
+
+    <h3>9.1 Testing Approach</h3>
+    <ul>
+        <li><strong>Manual Testing:</strong> Comprehensive testing of all user workflows</li>
+        <li><strong>Cross-browser Testing:</strong> Compatibility across major browsers</li>
+        <li><strong>Responsive Testing:</strong> Mobile and tablet device compatibility</li>
+        <li><strong>Security Testing:</strong> Authentication and authorization validation</li>
+    </ul>
+
+    <h3>9.2 Test Scenarios</h3>
+    
+    <h4>Authentication Testing</h4>
+    <ul>
+        <li>User registration with valid/invalid data</li>
+        <li>Login with correct/incorrect credentials</li>
+        <li>Token expiration and renewal</li>
+        <li>Role-based access control</li>
+    </ul>
+
+    <h4>Functional Testing</h4>
+    <ul>
+        <li>Session booking and management</li>
+        <li>Real-time messaging functionality</li>
+        <li>Feedback submission and retrieval</li>
+        <li>Admin user management operations</li>
+    </ul>
+
+    <h4>Performance Testing</h4>
+    <ul>
+        <li>Database query optimization</li>
+        <li>Real-time message delivery</li>
+        <li>Concurrent user handling</li>
+        <li>Memory usage optimization</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>10. Deployment & Maintenance</h2>
+
+    <h3>10.1 Deployment Requirements</h3>
+    
+    <h4>Server Requirements</h4>
+    <ul>
+        <li><strong>Node.js:</strong> Version 14.0 or higher</li>
+        <li><strong>Memory:</strong> Minimum 512MB RAM</li>
+        <li><strong>Storage:</strong> 1GB available disk space</li>
+        <li><strong>Network:</strong> Stable internet connection for real-time features</li>
+    </ul>
+
+    <h4>Dependencies</h4>
+    <div class="code-block">
+        {
+            "express": "^4.17.1",
+            "socket.io": "^4.0.0",
+            "sqlite3": "^5.0.0",
+            "bcrypt": "^5.0.0",
+            "jsonwebtoken": "^8.5.1",
+            "cors": "^2.8.5"
+        }
+    </div>
+
+    <h3>10.2 Installation Process</h3>
+    <ol>
+        <li>Clone the repository to the server</li>
+        <li>Install Node.js dependencies: <span class="highlight">npm install</span></li>
+        <li>Initialize the database: <span class="highlight">node db.js</span></li>
+        <li>Start the server: <span class="highlight">node server.js</span></li>
+        <li>Access the application at <span class="highlight">http://localhost:3000</span></li>
+    </ol>
+
+    <h3>10.3 Maintenance Procedures</h3>
+    <ul>
+        <li><strong>Database Backups:</strong> Regular SQLite database file backups</li>
+        <li><strong>Log Monitoring:</strong> Server and application log review</li>
+        <li><strong>Security Updates:</strong> Regular dependency updates and security patches</li>
+        <li><strong>Performance Monitoring:</strong> Database query optimization and server resource monitoring</li>
+    </ul>
+
+    <h2>11. Future Enhancements</h2>
+
+    <h3>11.1 Planned Features</h3>
+    <ul>
+        <li><strong>Video Conferencing:</strong> Integration with WebRTC for video sessions</li>
+        <li><strong>Calendar Integration:</strong> Google Calendar and Outlook integration</li>
+        <li><strong>Advanced Analytics:</strong> Detailed reporting and analytics dashboard</li>
+        <li><strong>Mobile Application:</strong> Native iOS and Android applications</li>
+        <li><strong>AI-Powered Insights:</strong> Sentiment analysis and conversation insights</li>
+    </ul>
+
+    <h3>11.2 Scalability Improvements</h3>
+    <ul>
+        <li><strong>Database Migration:</strong> Move to PostgreSQL or MySQL for better scalability</li>
+        <li><strong>Load Balancing:</strong> Implement multiple server instances</li>
+        <li><strong>Caching Layer:</strong> Redis integration for improved performance</li>
+        <li><strong>Microservices Architecture:</strong> Break down into smaller, focused services</li>
+    </ul>
+
+    <h3>11.3 Security Enhancements</h3>
+    <ul>
+        <li><strong>Two-Factor Authentication:</strong> SMS or email-based 2FA</li>
+        <li><strong>End-to-End Encryption:</strong> Message encryption for enhanced privacy</li>
+        <li><strong>Audit Logging:</strong> Comprehensive system activity logging</li>
+        <li><strong>GDPR Compliance:</strong> Data protection and privacy compliance</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>12. Conclusion</h2>
+
+    <p>The Online Counseling System successfully addresses the need for a digital platform that facilitates communication between students and counselors. The system provides a comprehensive solution with secure authentication, real-time messaging, session management, and administrative oversight capabilities.</p>
+
+    <h3>12.1 Project Achievements</h3>
+    <ul>
+        <li>Successfully implemented a full-stack web application with modern technologies</li>
+        <li>Created an intuitive user interface that serves multiple user types</li>
+        <li>Established secure communication channels with real-time capabilities</li>
+        <li>Implemented comprehensive user management and administrative features</li>
+        <li>Ensured data security and privacy through proper authentication and authorization</li>
+    </ul>
+
+    <h3>12.2 Technical Highlights</h3>
+    <ul>
+        <li>Modern JavaScript (ES6+) with async/await patterns</li>
+        <li>Real-time communication using Socket.io</li>
+        <li>Secure authentication with JWT and bcrypt</li>
+        <li>Responsive design with CSS3 and modern layout techniques</li>
+        <li>SQLite database with proper schema design</li>
+    </ul>
+
+    <h3>12.3 Impact and Benefits</h3>
+    <ul>
+        <li><strong>Accessibility:</strong> 24/7 availability of counseling services</li>
+        <li><strong>Efficiency:</strong> Streamlined session booking and communication</li>
+        <li><strong>Privacy:</strong> Secure and confidential communication channels</li>
+        <li><strong>Scalability:</strong> Can accommodate growing user base</li>
+        <li><strong>Cost-effectiveness:</strong> Reduced overhead compared to traditional methods</li>
+    </ul>
+
+    <p>The Online Counseling System represents a significant step forward in digitalizing counseling services, providing a robust, secure, and user-friendly platform that meets the needs of modern educational institutions and their stakeholders.</p>
+
+    <div style="margin-top: 50px; text-align: center; font-style: italic; color: #666;">
+        <p>Document generated on: <span id="currentDate"></span></p>
+        <p>Project: Online Counseling System</p>
+        <p>Version: 1.0</p>
+    </div>
+
+    <script>
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString();
+    </script>
+
+</body>
+</html> 

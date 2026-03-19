@@ -15,12 +15,17 @@ const JWT_SECRET = 'your_secret_key'; // Use a strong secret in production
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(express.json());
+// Mock user login  for demo purposes
+app.use((req, res, next) => {
+    req.user = {username: "admin", role: "admin" }; // force admin role 
+    next();
+});
+    
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // --- In-memory data ---
-let users = [
-    { username: "admin", password: "admin123", role: "admin", name: "Admin", email: "admin@site.com", active: true },
-];
+// REMOVE in-memory users array for persistent data
+// let users = [ ... ]; // <-- Remove this
 let messages = []; // {threadId, from, to, text, time, read, attachments}
 let threads = [];  // {id, name, users: [student, counselor]}
 
@@ -74,7 +79,7 @@ app.post('/login', (req, res) => {
 });
 
 // --- Counselors & Students List ---
-app.get('/counselors', (req, res) => {
+app.get('/counselors', authenticateToken, (req, res) => {
     db.all(
         `SELECT * FROM users WHERE role = 'counselor' AND active = 1`,
         [],
@@ -84,9 +89,8 @@ app.get('/counselors', (req, res) => {
         }
     );
 });
+// Allow all authenticated users to access /students
 app.get('/students', authenticateToken, (req, res) => {
-    // Only allow if admin
-    if (req.user.role !== 'admin') return res.status(403).json({ message: "Forbidden" });
     db.all(
         "SELECT * FROM users WHERE role = 'student' AND active = 1",
         [],
@@ -113,43 +117,66 @@ app.get('/assigned-students/:counselor', (req, res) => {
 });
 
 // --- Counselor Profile ---
-app.get('/counselor-profile', (req, res) => {
+// Use DB for persistent data
+app.get('/counselor-profile', authenticateToken, (req, res) => {
     const { username } = req.query;
-    const counselor = users.find(u => u.username === username && u.role === "counselor");
-    if (!counselor) return res.status(404).json({ message: "Counselor not found" });
-    res.json(counselor);
+    db.get(
+        `SELECT * FROM users WHERE username = ? AND role = 'counselor'`,
+        [username],
+        (err, counselor) => {
+            if (err || !counselor) return res.status(404).json({ message: "Counselor not found" });
+            delete counselor.password;
+            res.json(counselor);
+        }
+    );
 });
-app.post('/counselor-profile', (req, res) => {
+app.post('/counselor-profile', authenticateToken, (req, res) => {
     const { username, name, email, bio } = req.body;
-    const counselor = users.find(u => u.username === username && u.role === "counselor");
-    if (!counselor) return res.status(404).json({ message: "Counselor not found" });
-    counselor.name = name;
-    counselor.email = email;
-    counselor.bio = bio;
-    res.json({ success: true });
+    db.run(
+        `UPDATE users SET name = ?, email = ?, bio = ? WHERE username = ? AND role = 'counselor'`,
+        [name, email, bio, username],
+        function(err) {
+            if (err) return res.status(500).json({ message: "Database error" });
+            res.json({ success: true });
+        }
+    );
 });
-app.post('/counselor-leave', (req, res) => {
+app.post('/counselor-leave', authenticateToken, (req, res) => {
     const { username } = req.body;
-    const counselor = users.find(u => u.username === username && u.role === "counselor");
-    if (!counselor) return res.status(404).json({ message: "Counselor not found" });
-    counselor.active = false;
-    res.json({ success: true });
+    db.run(
+        `UPDATE users SET active = 0 WHERE username = ? AND role = 'counselor'`,
+        [username],
+        function(err) {
+            if (err) return res.status(500).json({ message: "Database error" });
+            res.json({ success: true });
+        }
+    );
 });
 
 // --- Remove (deactivate) users (admin) ---
-app.post('/remove-counselor', (req, res) => {
+app.post('/remove-counselor', authenticateToken, (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).json({ message: "Forbidden: Admins only." });
     const { username } = req.body;
-    const counselor = users.find(u => u.username === username && u.role === "counselor");
-    if (!counselor) return res.status(404).json({ message: "Counselor not found" });
-    counselor.active = false;
-    res.json({ success: true });
+    db.run(
+        `UPDATE users SET active = 0 WHERE username = ? AND role = 'counselor'`,
+        [username],
+        function(err) {
+            if (err) return res.status(500).json({ message: "Database error" });
+            res.json({ success: true });
+        }
+    );
 });
-app.post('/remove-student', (req, res) => {
+app.post('/remove-student', authenticateToken, (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).json({ message: "Forbidden: Admins only." });
     const { username } = req.body;
-    const student = users.find(u => u.username === username && u.role === "student");
-    if (!student) return res.status(404).json({ message: "Student not found" });
-    student.active = false;
-    res.json({ success: true });
+    db.run(
+        `UPDATE users SET active = 0 WHERE username = ? AND role = 'student'`,
+        [username],
+        function(err) {
+            if (err) return res.status(500).json({ message: "Database error" });
+            res.json({ success: true });
+        }
+    );
 });
 
 // --- Session Booking ---
@@ -383,34 +410,3 @@ const PORT = 3000;
 server.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
-
-function loadStudents() {
-    fetch(`http://localhost:3000/assigned-students/${counselor}`)
-        .then(res => res.json())
-        .then(students => {
-            const list = document.getElementById('studentsList');
-            if (!students.length) {
-                list.innerHTML = "<li>No students assigned yet.</li>";
-                return;
-            }
-            list.innerHTML = students.map(s =>
-                `<li>${s.name || s.username} (${s.username})</li>`
-            ).join('');
-        }); // <--- Make sure this parenthesis is here!
-}
-
-// Sessions logic
-function loadCounselorSessions() {
-    fetch(`http://localhost:3000/sessions?counselor=${encodeURIComponent(counselor)}`)
-        .then(res => res.json())
-        .then(data => {
-            const sessionsList = document.getElementById('counselorSessionsList');
-            if (!data.length) {
-                sessionsList.innerHTML = "<li>No sessions found.</li>";
-                return;
-            }
-            sessionsList.innerHTML = data.map(s =>
-                `<li>${s.date} - ${s.time}: ${s.topic || s.reason || ''} with ${s.student}</li>`
-            ).join('');
-        });
-}
